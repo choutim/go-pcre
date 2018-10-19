@@ -141,6 +141,7 @@ const (
 
 // Regexp holds a reference to a compiled regular expression.
 // Use Compile or MustCompile to create such objects.
+// Use FreeRegexp to free memory when done with the struct.
 type Regexp struct {
 	ptr   *C.pcre
 	extra *C.pcre_extra
