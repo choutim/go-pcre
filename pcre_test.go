@@ -174,22 +174,28 @@ func TestPartial(t *testing.T) {
 	} else if m.Partial() {
 		t.Error("Match was partial but should have been exact")
 	}
+	re.FreeRegexp()
 }
 
 func TestCaseless(t *testing.T) {
-	m := MustCompile("abc", CASELESS).MatcherString("...Abc...", 0)
+	re := MustCompile("abc", CASELESS)
+	m := re.MatcherString("...Abc...", 0)
 	if !m.Matches() {
 		t.Error("CASELESS")
 	}
-	m = MustCompile("abc", 0).MatcherString("Abc", 0)
+	re.FreeRegexp()
+	re = MustCompile("abc", 0)
+	m = re.MatcherString("Abc", 0)
 	if m.Matches() {
 		t.Error("!CASELESS")
 	}
+	re.FreeRegexp()
 }
 
 func TestNamed(t *testing.T) {
 	pattern := "(?<L>a)(?<M>X)*bc(?<DIGITS>\\d*)"
-	m := MustCompile(pattern, 0).MatcherString("abc12", 0)
+	re := MustCompile(pattern, 0)
+	m := re.MatcherString("abc12", 0)
 	if !m.Matches() {
 		t.Error("Matches")
 	}
@@ -205,10 +211,12 @@ func TestNamed(t *testing.T) {
 	if str, err := m.NamedString("DIGITS"); str != "12" || err != nil {
 		t.Errorf("NamedString(\"DIGITS\"): %v", err)
 	}
+	re.FreeRegexp()
 }
 
 func TestMatcherIndex(t *testing.T) {
-	m := MustCompile("bcd", 0).Matcher([]byte("abcdef"), 0)
+	re := MustCompile("bcd", 0)
+	m := re.Matcher([]byte("abcdef"), 0)
 	i := m.Index()
 	if i[0] != 1 {
 		t.Error("FindIndex start", i[0])
@@ -216,12 +224,14 @@ func TestMatcherIndex(t *testing.T) {
 	if i[1] != 4 {
 		t.Error("FindIndex end", i[1])
 	}
-
-	m = MustCompile("xyz", 0).Matcher([]byte("abcdef"), 0)
+	re.FreeRegexp()
+	re = MustCompile("xyz", 0)
+	m = re.Matcher([]byte("abcdef"), 0)
 	i = m.Index()
 	if i != nil {
 		t.Error("Index returned for non-match", i)
 	}
+	re.FreeRegexp()
 }
 
 func TestFindIndex(t *testing.T) {
@@ -233,6 +243,7 @@ func TestFindIndex(t *testing.T) {
 	if i[1] != 4 {
 		t.Error("FindIndex end", i[1])
 	}
+	re.FreeRegexp()
 }
 
 func TestExtract(t *testing.T) {
@@ -248,6 +259,7 @@ func TestExtract(t *testing.T) {
 	if i[2] != "d" {
 		t.Error("Second match group no as expected: ", i[2])
 	}
+	re.FreeRegexp()
 }
 
 func TestReplaceAll(t *testing.T) {
@@ -262,6 +274,7 @@ func TestReplaceAll(t *testing.T) {
 	if string(result) != "card fight carls car" {
 		t.Error("ReplaceAll2", result)
 	}
+	re.FreeRegexp()
 }
 
 func TestFreeRegexp(t *testing.T) {

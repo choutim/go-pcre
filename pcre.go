@@ -57,7 +57,7 @@ package pcre
 // #include <string.h>
 // #include "./pcre.h"
 // #include "./pcre_fallback.h"
-// void pcre_free_stub(void *re) {
+// static inline void pcre_free_stub(void *re) {
 //     pcre_free(re);
 // }
 import "C"
