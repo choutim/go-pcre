@@ -161,8 +161,9 @@ func pcreGroups(ptr *C.pcre) (count C.int) {
 
 // Free c allocated memory related to regexp.
 func (re *Regexp) FreeRegexp() {
+	// pcre_free is a function pointer, call a stub that calls it.
 	if re.ptr != nil {
-		C.free(unsafe.Pointer(re.ptr))
+		C.pcre_free_stub(unsafe.Pointer(re.ptr))
 	}
 	if re.extra != nil {
 		C.pcre_free_study(re.extra)
