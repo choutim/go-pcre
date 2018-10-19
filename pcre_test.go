@@ -263,3 +263,16 @@ func TestReplaceAll(t *testing.T) {
 		t.Error("ReplaceAll2", result)
 	}
 }
+
+func TestFreeRegexp(t *testing.T) {
+	re := MustCompileJIT("\\d{3}", 0, STUDY_JIT_COMPILE)
+	data := [...]string{"15asd213", "sadi32fjoi"}
+	expected := [...]bool{true, false}
+	for i := 0; i < len(data); i++ {
+		m := re.MatcherString(data[i], 0)
+		if m.Matches() != expected[i] {
+			t.Error("Unexpected match for ", data[i])
+		}
+	}
+	re.FreeRegexp()
+}

@@ -53,9 +53,9 @@
 // http://www.pcre.org/pcre.txt
 package pcre
 
-// #cgo pkg-config: libpcre
-// #include <pcre.h>
+// #cgo LDFLAGS: ${SRCDIR}/libs/libpcre.a
 // #include <string.h>
+// #include "./pcre.h"
 // #include "./pcre_fallback.h"
 import "C"
 
@@ -139,8 +139,9 @@ const (
 // Regexp holds a reference to a compiled regular expression.
 // Use Compile or MustCompile to create such objects.
 type Regexp struct {
-	ptr   []byte
-	extra []byte
+	ptr      []byte
+	extra    []byte
+	extraPtr *_Ctype_struct_pcre_extra
 }
 
 // Number of bytes in the compiled pattern
@@ -165,6 +166,11 @@ func toHeap(ptr *C.pcre) (re Regexp) {
 	re.ptr = make([]byte, size)
 	C.memcpy(unsafe.Pointer(&re.ptr[0]), unsafe.Pointer(ptr), size)
 	return
+}
+
+// Free c allocated memory related to regexp.
+func (ptr *Regexp) FreeRegexp() {
+	C.pcre_free_study(ptr.extraPtr)
 }
 
 // Compile the pattern and return a compiled regexp.
@@ -244,7 +250,7 @@ func (re *Regexp) Study(flags int) error {
 		// Studying the pattern may not produce useful information.
 		return nil
 	}
-	defer C.free(unsafe.Pointer(extra))
+	re.extraPtr = extra
 
 	var size C.size_t
 	rc := C.pcre_fullinfo(ptr, extra, C.PCRE_INFO_JITSIZE, unsafe.Pointer(&size))
